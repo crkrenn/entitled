@@ -14,22 +14,23 @@ suite('WindowTitleService Tests', () => {
         windowTitleService.dispose();
     });
 
-    suite('Title Component Extraction', () => {        test('should extract workspace name when workspace is available', () => {
+    suite('Title Component Extraction', () => {
+        test('should extract workspace name when workspace is available', () => {
             const mockWorkspace = {
                 name: 'my-project',
                 uri: vscode.Uri.file('/path/to/my-project'),
                 index: 0
             };
-            
+
             const result = windowTitleService.extractWorkspaceName(mockWorkspace);
             assert.strictEqual(result, 'my-project');
-        });        test('should extract folder name when workspace name is unavailable', () => {
+        }); test('should extract folder name when workspace name is unavailable', () => {
             const mockWorkspace = {
                 name: '',
                 uri: vscode.Uri.file('/path/to/project-folder'),
                 index: 0
             } as vscode.WorkspaceFolder;
-            
+
             const result = windowTitleService.extractWorkspaceName(mockWorkspace);
             assert.strictEqual(result, 'project-folder');
         });
@@ -58,7 +59,7 @@ suite('WindowTitleService Tests', () => {
                     uri: vscode.Uri.file('/path/to/file.ts')
                 }
             };
-            
+
             const result = windowTitleService.extractFileName(mockEditor as any);
             assert.strictEqual(result, 'file.ts');
         });
@@ -96,7 +97,8 @@ suite('WindowTitleService Tests', () => {
             const result = windowTitleService.extractFolderName(undefined);
             assert.strictEqual(result, '');
         });
-    });    suite('Title Composition', () => {        test('should compose title with all components available', () => {
+    }); suite('Title Composition', () => {
+        test('should compose title with all components available', () => {
             const components = {
                 workspace: 'my-project',
                 repo: 'my-repo',
@@ -107,7 +109,7 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeDefaultTitle(components);
             assert.strictEqual(result, 'my-project [feature/new-feature] index.ts - VSCode');
-        });test('should compose title with workspace and filename only', () => {
+        }); test('should compose title with workspace and filename only', () => {
             const components = {
                 workspace: 'my-project',
                 repo: 'my-repo',
@@ -118,7 +120,7 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeDefaultTitle(components);
             assert.strictEqual(result, 'my-project index.ts - VSCode');
-        });        test('should compose title with filename only', () => {
+        }); test('should compose title with filename only', () => {
             const components = {
                 workspace: '',
                 repo: '',
@@ -129,7 +131,7 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeDefaultTitle(components);
             assert.strictEqual(result, 'index.ts - VSCode');
-        });        test('should compose title with just VSCode when no components', () => {
+        }); test('should compose title with just VSCode when no components', () => {
             const components = {
                 workspace: '',
                 repo: '',
@@ -140,7 +142,7 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeDefaultTitle(components);
             assert.strictEqual(result, 'VSCode');
-        });        test('should handle branch name with special characters', () => {
+        }); test('should handle branch name with special characters', () => {
             const components = {
                 workspace: 'my-project',
                 repo: 'my-repo',
@@ -166,7 +168,7 @@ suite('WindowTitleService Tests', () => {
             });
 
             await windowTitleService.updateTitle();
-            
+
             assert.strictEqual(titleUpdateCalled, true);
             assert.strictEqual(typeof updatedTitle, 'string');
         });
@@ -180,10 +182,11 @@ suite('WindowTitleService Tests', () => {
 
             // Simulate editor change
             await windowTitleService.handleActiveEditorChange();
-            
+
             assert.strictEqual(updateCount, 1);
         });
-    });    suite('Configuration', () => {        test('should respect custom title pattern when configured', () => {
+    }); suite('Configuration', () => {
+        test('should respect custom title pattern when configured', () => {
             const customPattern = '{filename} | {workspace} | {branch}';
             const components = {
                 workspace: 'my-project',
@@ -195,7 +198,7 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeCustomTitle(customPattern, components);
             assert.strictEqual(result, 'test.ts | my-project | main');
-        });test('should handle missing components in custom pattern', () => {
+        }); test('should handle missing components in custom pattern', () => {
             const customPattern = '{filename} | {workspace} | {branch}';
             const components = {
                 workspace: 'my-project',
@@ -207,7 +210,7 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeCustomTitle(customPattern, components);
             assert.strictEqual(result, 'test.ts | my-project | ');
-        });        test('should include timestamp in custom pattern', () => {
+        }); test('should include timestamp in custom pattern', () => {
             const customPattern = '{filename} ({timestamp}) - {workspace}';
             const components = {
                 workspace: 'my-project',
@@ -219,7 +222,7 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeCustomTitle(customPattern, components);
             assert.strictEqual(result, 'test.ts (14:30) - my-project');
-        });test('should include repo name in custom pattern', () => {
+        }); test('should include repo name in custom pattern', () => {
             const customPattern = '{repo} [{branch}] {filename}';
             const components = {
                 workspace: 'my-project',
@@ -374,7 +377,7 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeCustomTitle(customPattern, components);
             assert.strictEqual(result, 'app.ts - my-project');
-        });        test('should handle complex pattern with fallbacks and regular variables', () => {
+        }); test('should handle complex pattern with fallbacks and regular variables', () => {
             const customPattern = '{workspace || repo} [{branch}] {filename} (last: {timestamp})';
             const components = {
                 workspace: '',
@@ -579,7 +582,7 @@ suite('WindowTitleService Tests', () => {
         test('should format timestamp in 24-hour format', () => {
             const testTime = new Date('2024-01-15T14:30:00'); // 2:30 PM
             windowTitleService.setLastModified(testTime);
-            
+
             const result = windowTitleService.getFormattedTimestamp();
             assert.strictEqual(result, '14:30');
         });
@@ -587,7 +590,7 @@ suite('WindowTitleService Tests', () => {
         test('should format morning time correctly', () => {
             const morningTime = new Date('2024-01-15T09:05:00'); // 9:05 AM
             windowTitleService.setLastModified(morningTime);
-            
+
             const result = windowTitleService.getFormattedTimestamp();
             assert.strictEqual(result, '09:05');
         });
@@ -595,7 +598,7 @@ suite('WindowTitleService Tests', () => {
         test('should format midnight correctly', () => {
             const midnight = new Date('2024-01-15T00:00:00'); // Midnight
             windowTitleService.setLastModified(midnight);
-            
+
             const result = windowTitleService.getFormattedTimestamp();
             assert.strictEqual(result, '00:00');
         });
@@ -603,7 +606,7 @@ suite('WindowTitleService Tests', () => {
         test('should format late evening correctly', () => {
             const lateEvening = new Date('2024-01-15T23:45:00'); // 11:45 PM
             windowTitleService.setLastModified(lateEvening);
-            
+
             const result = windowTitleService.getFormattedTimestamp();
             assert.strictEqual(result, '23:45');
         });
