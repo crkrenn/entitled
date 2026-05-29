@@ -24,9 +24,12 @@ export class WindowTitleService {
     }
 
     private setupEventListeners(): void {
+        console.log('Entitled: Setting up event listeners');
+
         // Listen for active editor changes
         this.disposables.push(
             vscode.window.onDidChangeActiveTextEditor(() => {
+                console.log('Entitled: Active editor changed - updating title');
                 this.handleActiveEditorChange();
             })
         );        // Listen for workspace changes
@@ -51,10 +54,13 @@ export class WindowTitleService {
         this.disposables.push(
             vscode.workspace.onDidChangeConfiguration((e) => {
                 if (e.affectsConfiguration('entitled')) {
+                    console.log('Entitled: Configuration changed - updating title');
                     this.updateTitle();
                 }
             })
         );
+
+        console.log('Entitled: Event listeners set up successfully');
     }public extractWorkspaceName(workspace: vscode.WorkspaceFolder | undefined): string {
         if (!workspace) {
             return '';
