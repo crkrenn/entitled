@@ -314,7 +314,118 @@ suite('WindowTitleService Tests', () => {
             assert.strictEqual(result, 'awesome-project [feature/new-stuff] index.ts (last: 15:30)');
         });
 
-    });    suite('Timestamp Functionality', () => {
+    });
+
+    suite('Environment Variable Support', () => {
+        test('should resolve environment variables with env. prefix', () => {
+            // Set a test environment variable
+            process.env.TEST_VAR = 'test-value';
+
+            const customPattern = '{env.TEST_VAR}';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'app.ts',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'test-value');
+
+            // Clean up
+            delete process.env.TEST_VAR;
+        });
+
+        test('should return empty string for non-existent environment variable', () => {
+            const customPattern = '{env.NONEXISTENT_VAR}';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'app.ts',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, '');
+        });
+
+        test('should work with USER environment variable', () => {
+            // USER should typically be set in most environments
+            const customPattern = '{env.USER}@host';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'app.ts',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            // Just check it doesn't error and produces something
+            assert.strictEqual(typeof result, 'string');
+            assert.ok(result.includes('@host'));
+        });
+
+        test('should support environment variables in fallback chains', () => {
+            process.env.TEST_ENV = 'env-value';
+
+            const customPattern = '{env.MISSING || env.TEST_ENV || workspace}';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'app.ts',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'env-value');
+
+            delete process.env.TEST_ENV;
+        });
+
+        test('should combine environment variables with other variables', () => {
+            process.env.TEST_USER = 'testuser';
+            process.env.TEST_HOST = 'testhost';
+
+            const customPattern = '{env.TEST_USER}@{env.TEST_HOST} | {workspace} [{branch}]';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'app.ts',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'testuser@testhost | my-project [main]');
+
+            delete process.env.TEST_USER;
+            delete process.env.TEST_HOST;
+        });
+
+        test('should handle environment variables with special characters', () => {
+            process.env.TEST_VAR_WITH_UNDERSCORE = 'value_with_underscore';
+
+            const customPattern = '{env.TEST_VAR_WITH_UNDERSCORE}';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'app.ts',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'value_with_underscore');
+
+            delete process.env.TEST_VAR_WITH_UNDERSCORE;
+        });
+    });
+
+    suite('Timestamp Functionality', () => {
         test('should format timestamp in 24-hour format', () => {
             const testTime = new Date('2024-01-15T14:30:00'); // 2:30 PM
             windowTitleService.setLastModified(testTime);

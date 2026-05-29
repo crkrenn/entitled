@@ -1,5 +1,30 @@
 # Entitled Extension - Change Journal
 
+## 2026-05-28 - Environment Variable Support
+**What Changed:** Added support for environment variables in window title patterns
+**Why:** Users can now include system information like username and hostname in their window titles
+**Files Modified:**
+- `src/services/WindowTitleService.ts` - Added environment variable resolution for `{env.VARNAME}` pattern
+- `README.md` - Updated documentation with environment variable examples
+- `package.json` - Updated configuration description to include environment variables
+- `src/test/suite/windowTitleService.test.ts` - Added 6 comprehensive tests for environment variable support
+
+**New Functionality:**
+- ✅ Support for `{env.VARNAME}` syntax (e.g., `{env.USER}`, `{env.HOSTNAME}`)
+- ✅ Environment variables work in fallback chains (e.g., `{env.USER || workspace}`)
+- ✅ Can combine with existing variables (e.g., `{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]`)
+
+**Example Patterns:**
+- `{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]` → `username@hostname | my-project [main]`
+- `{env.USER || workspace} - {repo}` → Falls back to workspace if USER not set
+
+**Test Coverage:** All 37 tests passing ✅
+
+**Documentation Update:**
+- ✅ Added comprehensive guide for mixing VS Code's built-in variables (`${remoteName}`, `${dirty}`, etc.) with custom variables
+- ✅ Included examples for Remote SSH/WSL/Container development scenarios
+- ✅ Clarified syntax difference: `{custom}` vs `${builtin}`
+
 ## Project Setup Phase
 
 ### 2025-06-24 - Initial Extension Structure

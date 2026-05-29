@@ -171,6 +171,12 @@ export class WindowTitleService {
     }
 
     private getVariableValue(variable: string, components: TitleComponents): string {
+        // Check for environment variables (e.g., env.USER, env.HOSTNAME)
+        if (variable.startsWith('env.')) {
+            const envVar = variable.substring(4); // Remove 'env.' prefix
+            return process.env[envVar] || '';
+        }
+
         switch (variable) {
             case 'workspace':
                 return components.workspace;
