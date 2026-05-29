@@ -8,6 +8,7 @@
 - `README.md` - Removed incorrect references to VS Code built-in variables, added `{folder}` documentation
 - `package.json` - Updated description to remove VS Code built-in variable references
 - `ENV_VAR_FEATURE.md` - Corrected documentation
+- `src/test/suite/windowTitleService.test.ts` - Added 10 tests for {folder} and {env.var} functionality
 
 **New Functionality:**
 - ✅ `{folder}` variable - Shows folder name containing the active file (e.g., "src")
@@ -19,6 +20,8 @@
 **Example Patterns:**
 - `{env.USER}@{env.HOSTNAME} {folder}/{filename}` → `john@myserver src/index.ts`
 - `{workspace} [{branch}] {folder}/{filename}` → `my-project [main] src/index.ts`
+
+**Test Coverage:** All 47 tests passing ✅
 
 ## 2026-05-28 - Environment Variable Support
 **What Changed:** Added support for environment variables in window title patterns
