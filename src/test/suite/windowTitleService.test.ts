@@ -67,6 +67,35 @@ suite('WindowTitleService Tests', () => {
             const result = windowTitleService.extractFileName(undefined);
             assert.strictEqual(result, '');
         });
+
+        test('should extract folder name from active editor', () => {
+            const mockEditor = {
+                document: {
+                    fileName: '/path/to/src/file.ts',
+                    uri: vscode.Uri.file('/path/to/src/file.ts')
+                }
+            };
+
+            const result = windowTitleService.extractFolderName(mockEditor as any);
+            assert.strictEqual(result, 'src');
+        });
+
+        test('should extract nested folder name from active editor', () => {
+            const mockEditor = {
+                document: {
+                    fileName: '/workspace/components/Button/index.tsx',
+                    uri: vscode.Uri.file('/workspace/components/Button/index.tsx')
+                }
+            };
+
+            const result = windowTitleService.extractFolderName(mockEditor as any);
+            assert.strictEqual(result, 'Button');
+        });
+
+        test('should return empty string when no active editor for folder', () => {
+            const result = windowTitleService.extractFolderName(undefined);
+            assert.strictEqual(result, '');
+        });
     });    suite('Title Composition', () => {        test('should compose title with all components available', () => {
             const components = {
                 workspace: 'my-project',
@@ -202,6 +231,51 @@ suite('WindowTitleService Tests', () => {
 
             const result = windowTitleService.composeCustomTitle(customPattern, components);
             assert.strictEqual(result, 'awesome-project [feature/new-feature] app.ts');
+        });
+
+        test('should include folder name in custom pattern', () => {
+            const customPattern = '{folder}/{filename}';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'index.ts',
+                folder: 'src',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'src/index.ts');
+        });
+
+        test('should combine folder with other variables', () => {
+            const customPattern = '{workspace} | {folder}/{filename} [{branch}]';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'feature/xyz',
+                filename: 'Button.tsx',
+                folder: 'components',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'my-project | components/Button.tsx [feature/xyz]');
+        });
+
+        test('should handle empty folder name gracefully', () => {
+            const customPattern = '{folder}/{filename}';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'index.ts',
+                folder: '',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, '/index.ts');
         });
 
         test('should handle fallback patterns with || syntax', () => {
@@ -422,6 +496,82 @@ suite('WindowTitleService Tests', () => {
             assert.strictEqual(result, 'value_with_underscore');
 
             delete process.env.TEST_VAR_WITH_UNDERSCORE;
+        });
+
+        test('should combine env variables with folder and filename', () => {
+            process.env.TEST_USER = 'john';
+            process.env.TEST_HOST = 'devbox';
+
+            const customPattern = '{env.TEST_USER}@{env.TEST_HOST} {folder}/{filename}';
+            const components = {
+                workspace: 'my-project',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'index.ts',
+                folder: 'src',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'john@devbox src/index.ts');
+
+            delete process.env.TEST_USER;
+            delete process.env.TEST_HOST;
+        });
+
+        test('should handle env variables in complex patterns', () => {
+            process.env.TEST_ENV_USER = 'alice';
+
+            const customPattern = '{env.TEST_ENV_USER} | {workspace} [{branch}] {folder}/{filename}';
+            const components = {
+                workspace: 'api-service',
+                repo: 'backend',
+                branch: 'feature/auth',
+                filename: 'handler.ts',
+                folder: 'controllers',
+                timestamp: '14:30'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'alice | api-service [feature/auth] controllers/handler.ts');
+
+            delete process.env.TEST_ENV_USER;
+        });
+
+        test('should handle env variable as part of fallback chain', () => {
+            process.env.FALLBACK_TEST = 'env-value';
+
+            const customPattern = '{workspace || env.FALLBACK_TEST}';
+            const components = {
+                workspace: '',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'app.ts',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'env-value');
+
+            delete process.env.FALLBACK_TEST;
+        });
+
+        test('should prioritize regular variables over env variables in fallback', () => {
+            process.env.FALLBACK_TEST2 = 'env-value';
+
+            const customPattern = '{workspace || env.FALLBACK_TEST2}';
+            const components = {
+                workspace: 'workspace-value',
+                repo: 'my-repo',
+                branch: 'main',
+                filename: 'app.ts',
+                timestamp: 'now'
+            };
+
+            const result = windowTitleService.composeCustomTitle(customPattern, components);
+            assert.strictEqual(result, 'workspace-value');
+
+            delete process.env.FALLBACK_TEST2;
         });
     });
 
