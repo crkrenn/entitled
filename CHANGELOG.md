@@ -1,5 +1,48 @@
 # Entitled Extension - Change Journal
 
+## 2026-05-29 - Added {folder} Variable & Documentation Fixes
+**What Changed:** Added `{folder}` variable for current file's folder name and corrected documentation
+**Why:** Users needed folder name variable, and VS Code built-in variables don't work with this extension
+**Files Modified:**
+- `src/services/WindowTitleService.ts` - Added `extractFolderName()` method and `{folder}` variable
+- `README.md` - Removed incorrect references to VS Code built-in variables, added `{folder}` documentation
+- `package.json` - Updated description to remove VS Code built-in variable references
+- `ENV_VAR_FEATURE.md` - Corrected documentation
+- `src/test/suite/windowTitleService.test.ts` - Added 10 tests for {folder} and {env.var} functionality
+
+**New Functionality:**
+- ✅ `{folder}` variable - Shows folder name containing the active file (e.g., "src")
+
+**Important Correction:**
+- ❌ VS Code built-in variables like `${remoteName}`, `${dirty}`, `${separator}` do **NOT** work with this extension
+- ✅ Use only custom variables with `{variable}` syntax
+
+**Example Patterns:**
+- `{env.USER}@{env.HOSTNAME} {folder}/{filename}` → `john@myserver src/index.ts`
+- `{workspace} [{branch}] {folder}/{filename}` → `my-project [main] src/index.ts`
+
+**Test Coverage:** All 47 tests passing ✅
+
+## 2026-05-28 - Environment Variable Support
+**What Changed:** Added support for environment variables in window title patterns
+**Why:** Users can now include system information like username and hostname in their window titles
+**Files Modified:**
+- `src/services/WindowTitleService.ts` - Added environment variable resolution for `{env.VARNAME}` pattern
+- `README.md` - Updated documentation with environment variable examples
+- `package.json` - Updated configuration description to include environment variables
+- `src/test/suite/windowTitleService.test.ts` - Added 6 comprehensive tests for environment variable support
+
+**New Functionality:**
+- ✅ Support for `{env.VARNAME}` syntax (e.g., `{env.USER}`, `{env.HOSTNAME}`)
+- ✅ Environment variables work in fallback chains (e.g., `{env.USER || workspace}`)
+- ✅ Can combine with existing variables (e.g., `{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]`)
+
+**Example Patterns:**
+- `{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]` → `username@hostname | my-project [main]`
+- `{env.USER || workspace} - {repo}` → Falls back to workspace if USER not set
+
+**Test Coverage:** All 37 tests passing ✅
+
 ## Project Setup Phase
 
 ### 2025-06-24 - Initial Extension Structure

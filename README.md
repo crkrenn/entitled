@@ -4,11 +4,11 @@
 [![Installs](https://img.shields.io/visual-studio-marketplace/i/your-publisher-name.entitled)](https://marketplace.visualstudio.com/items?itemName=your-publisher-name.entitled)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A VS Code extension that customizes window titles to show the information you actually need: **workspace name**, **git repository**, **branch**, **filename**, and **timestamps** with smart fallback patterns.
+A VS Code extension that customizes window titles to show the information you actually need: **workspace name**, **git repository**, **branch**, **filename**, **timestamps**, and **environment variables** with smart fallback patterns.
 
 ## ✨ Features
 
-- 🏷️ **Smart Window Titles**: Display workspace, repository, branch, filename, and timestamps
+- 🏷️ **Smart Window Titles**: Display workspace, repository, branch, filename, folder, timestamps, and environment variables
 - 🌳 **Git Integration**: Automatically detects repository name and branch using VS Code's Git API  
 - ⚙️ **Fully Customizable**: Create your own title patterns with template variables
 - 🔄 **Real-time Updates**: Titles update automatically when you switch files, lose focus, or change branches
@@ -22,7 +22,14 @@ A VS Code extension that customizes window titles to show the information you ac
 2. Open any workspace with a Git repository
 3. Your window title will automatically show: `workspace-name [branch-name] filename.ext - VSCode`
 
-To enable smart fallbacks, try: `{workspace || repo || filename} [{branch}] (last: {timestamp})`
+**Want to show username and hostname?** Use environment variables:
+```json
+{
+  "entitled.titlePattern": "{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]"
+}
+```
+
+**Want smart fallbacks?** Try: `{workspace || repo || filename} [{branch}] (last: {timestamp})`
 
 ## 📋 Default Format
 
@@ -58,7 +65,11 @@ my-project [feature/new-feature] index.ts - VSCode
 - `{repo}` - Git repository name (extracted from git config)
 - `{branch}` - Current git branch
 - `{filename}` - Active file name
+- `{folder}` - Folder name containing the active file
 - `{timestamp}` - Last modification time in 24-hour format (HH:MM, updates on window focus loss)
+- `{env.VARNAME}` - Any environment variable (e.g., `{env.USER}`, `{env.HOSTNAME}`, `{env.HOST}`)
+
+**Note:** All variables use single curly braces `{variable}`. VS Code's built-in variables like `${remoteName}` are **not** supported by this extension.
 
 **Fallback Patterns:**
 
@@ -102,6 +113,18 @@ Use the `||` operator to create smart fallbacks that gracefully handle missing i
 
 // Complex pattern with multiple fallbacks
 "{workspace || repo || filename} [{branch}] (last: {timestamp}) - VSCode"
+
+// With username and hostname
+"{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]"
+
+// Environment variables with fallbacks
+"{env.USER || workspace} - {repo} [{branch}]"
+
+// Folder and filename
+"{env.USER}@{env.HOSTNAME} {folder}/{filename}"
+
+// Full example with all components
+"{env.USER}@{env.HOSTNAME} | {workspace} [{branch}] {folder}/{filename} (last: {timestamp})"
 ```
 
 ## 🛠️ Development

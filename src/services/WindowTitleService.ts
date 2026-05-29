@@ -7,6 +7,7 @@ export interface TitleComponents {
     repo: string;
     branch: string;
     filename: string;
+    folder?: string;
     timestamp: string;
 }
 
@@ -24,9 +25,12 @@ export class WindowTitleService {
     }
 
     private setupEventListeners(): void {
+        console.log('Entitled: Setting up event listeners');
+
         // Listen for active editor changes
         this.disposables.push(
             vscode.window.onDidChangeActiveTextEditor(() => {
+                console.log('Entitled: Active editor changed - updating title');
                 this.handleActiveEditorChange();
             })
         );        // Listen for workspace changes
@@ -51,10 +55,13 @@ export class WindowTitleService {
         this.disposables.push(
             vscode.workspace.onDidChangeConfiguration((e) => {
                 if (e.affectsConfiguration('entitled')) {
+                    console.log('Entitled: Configuration changed - updating title');
                     this.updateTitle();
                 }
             })
         );
+
+        console.log('Entitled: Event listeners set up successfully');
     }public extractWorkspaceName(workspace: vscode.WorkspaceFolder | undefined): string {
         if (!workspace) {
             return '';
@@ -102,6 +109,15 @@ export class WindowTitleService {
         }
 
         return path.basename(editor.document.fileName);
+    }
+
+    public extractFolderName(editor: vscode.TextEditor | undefined): string {
+        if (!editor) {
+            return '';
+        }
+
+        const folderPath = path.dirname(editor.document.fileName);
+        return path.basename(folderPath);
     }    public composeTitle(components: TitleComponents): string {
         // Check if custom title is enabled
         const config = vscode.workspace.getConfiguration('entitled');
@@ -171,6 +187,12 @@ export class WindowTitleService {
     }
 
     private getVariableValue(variable: string, components: TitleComponents): string {
+        // Check for environment variables (e.g., env.USER, env.HOSTNAME)
+        if (variable.startsWith('env.')) {
+            const envVar = variable.substring(4); // Remove 'env.' prefix
+            return process.env[envVar] || '';
+        }
+
         switch (variable) {
             case 'workspace':
                 return components.workspace;
@@ -180,6 +202,8 @@ export class WindowTitleService {
                 return components.branch;
             case 'filename':
                 return components.filename;
+            case 'folder':
+                return components.folder || '';
             case 'timestamp':
                 return components.timestamp;
             default:
@@ -257,13 +281,19 @@ export class WindowTitleService {
             ? await this.extractRepoName(workspace.uri.fsPath)
             : '';
               const filename = this.extractFileName(vscode.window.activeTextEditor);
+        const folder = this.extractFolderName(vscode.window.activeTextEditor);
         const timestamp = this.formatTimestamp(this.lastModified);
+
+        console.log('Entitled: Extracted filename:', filename);
+        console.log('Entitled: Extracted folder:', folder);
+        console.log('Entitled: Active editor:', vscode.window.activeTextEditor?.document.fileName);
 
         return {
             workspace: workspaceName,
             repo: repoName,
             branch: branchName,
             filename: filename,
+            folder: folder,
             timestamp: timestamp
         };
     }    public dispose(): void {

@@ -2,7 +2,7 @@
   "name": "entitled",
   "displayName": "Entitled - Custom Window Titles",
   "description": "Customize VS Code window titles with workspace, branch, and filename information",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "publisher": "ASHURTECHNET",
   "repository": {
     "type": "git",
@@ -32,7 +32,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -63,7 +65,7 @@
         "entitled.titlePattern": {
           "type": "string",
           "default": "{workspace} {branch} {filename} - VSCode",
-          "description": "Custom title pattern with variable substitution and smart fallbacks. Variables: {workspace}, {repo}, {branch}, {filename}, {timestamp}. Use || for fallbacks: {workspace || repo || filename} will use the first non-empty value. Examples: '{workspace || repo} [{branch}] (last: {timestamp})' or '{timestamp} | {workspace || repo || filename}'"
+          "description": "Custom title pattern with variable substitution and smart fallbacks. Variables: {workspace}, {repo}, {branch}, {filename}, {folder}, {timestamp}, {env.VARNAME}. Use || for fallbacks: {workspace || repo || filename}. Examples: '{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]' or '{folder}/{filename}'"
         }
       }
     }

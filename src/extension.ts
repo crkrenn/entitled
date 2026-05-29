@@ -4,13 +4,16 @@ import { WindowTitleService } from './services/WindowTitleService';
 let windowTitleService: WindowTitleService;
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "entitled" is now active!');
+	console.log('Entitled: Extension is now activating!');
+	console.log('Entitled: Activation time:', new Date().toISOString());
 
 	// Initialize the window title service
 	windowTitleService = new WindowTitleService();
+	console.log('Entitled: WindowTitleService initialized');
 
 	// Initial title update
 	windowTitleService.updateTitle();
+	console.log('Entitled: Initial title update triggered');
 
 	// Register the hello world command for testing
 	let helloWorldDisposable = vscode.commands.registerCommand('entitled.helloWorld', () => {

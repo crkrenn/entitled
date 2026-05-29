@@ -15,7 +15,7 @@ async function runCommand(command, args, env = {}) {
         }
         
         const child = spawn(command, args, {
-            cwd: path.resolve(__dirname, '../..'),
+            cwd: __dirname,
             env: { ...process.env, ...env },
             stdio: 'inherit',
             shell: true

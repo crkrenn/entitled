@@ -92,3 +92,4 @@ Thumbs.db
 *.swo
 *~
 .vscode/settings.json
+.nyc_output
