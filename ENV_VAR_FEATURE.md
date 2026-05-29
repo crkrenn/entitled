@@ -48,31 +48,30 @@ Result: `14:30 | crkrenn | my-project`
 - `PWD` - Present working directory
 - `TERM` - Terminal type
 
-## VS Code Built-in Variables
-The extension also supports VS Code's built-in variables (note the `${}` syntax):
+## Additional Variables
+The extension also provides `{folder}` and `{filename}` variables:
 
 ```json
 {
-  "entitled.titlePattern": "${remoteName} | {env.USER} | {workspace} [{branch}]"
+  "entitled.titlePattern": "{env.USER}@{env.HOSTNAME} {folder}/{filename}"
 }
 ```
 
-**Available VS Code Variables:**
-- `${remoteName}` - Remote name for SSH/WSL/Dev Containers (e.g., "ssh: myserver")
-- `${dirty}` - Dirty indicator (shows dot when file modified)
-- `${activeEditorShort}` - Short filename
-- `${rootName}` - Workspace root name
-- `${separator}` - Conditional separator
-- `${appName}` - "Visual Studio Code"
-- `${profileName}` - Profile name
+**Available Variables:**
+- `{folder}` - Folder name containing the active file (e.g., "src")
+- `{filename}` - Active file name (e.g., "index.ts")
+- `{workspace}` - Workspace name
+- `{repo}` - Git repository name
+- `{branch}` - Current git branch
+- `{timestamp}` - Last modification time
 
-**Example for Remote Development:**
+**Example with all components:**
 ```json
 {
-  "entitled.titlePattern": "${remoteName} | {env.USER}@{env.HOSTNAME} | {workspace} [{branch}]"
+  "entitled.titlePattern": "{env.USER}@{env.HOSTNAME} | {workspace} [{branch}] {folder}/{filename}"
 }
 ```
-Result when SSH'd: `ssh: prod-server | john@prod-server | my-app [main]`
+Result: `john@myserver | my-app [main] src/index.ts`
 
 ## Testing
 Added 6 comprehensive tests covering:

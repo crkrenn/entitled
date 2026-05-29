@@ -8,7 +8,7 @@ A VS Code extension that customizes window titles to show the information you ac
 
 ## ✨ Features
 
-- 🏷️ **Smart Window Titles**: Display workspace, repository, branch, filename, timestamps, environment variables, and VS Code built-in variables (like `${remoteName}` for SSH)
+- 🏷️ **Smart Window Titles**: Display workspace, repository, branch, filename, folder, timestamps, and environment variables
 - 🌳 **Git Integration**: Automatically detects repository name and branch using VS Code's Git API  
 - ⚙️ **Fully Customizable**: Create your own title patterns with template variables
 - 🔄 **Real-time Updates**: Titles update automatically when you switch files, lose focus, or change branches
@@ -22,10 +22,10 @@ A VS Code extension that customizes window titles to show the information you ac
 2. Open any workspace with a Git repository
 3. Your window title will automatically show: `workspace-name [branch-name] filename.ext - VSCode`
 
-**Remote Development (SSH/WSL/Containers)?** Use VS Code's built-in `${remoteName}`:
+**Want to show username and hostname?** Use environment variables:
 ```json
 {
-  "entitled.titlePattern": "${remoteName} | {workspace} [{branch}]"
+  "entitled.titlePattern": "{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]"
 }
 ```
 
@@ -65,40 +65,11 @@ my-project [feature/new-feature] index.ts - VSCode
 - `{repo}` - Git repository name (extracted from git config)
 - `{branch}` - Current git branch
 - `{filename}` - Active file name
+- `{folder}` - Folder name containing the active file
 - `{timestamp}` - Last modification time in 24-hour format (HH:MM, updates on window focus loss)
 - `{env.VARNAME}` - Any environment variable (e.g., `{env.USER}`, `{env.HOSTNAME}`, `{env.HOST}`)
 
-**VS Code Built-in Variables:**
-
-You can also mix in VS Code's built-in variables (use `${}` syntax, not `{}`):
-
-- `${remoteName}` - Remote name for SSH/WSL/containers (e.g., "ssh: myserver")
-- `${dirty}` - Dirty indicator (dot when file is modified)
-- `${activeEditorShort}` - Short filename of active editor
-- `${rootName}` - Workspace root folder name
-- `${separator}` - Conditional separator (" - ")
-- `${appName}` - "Visual Studio Code"
-- `${profileName}` - Current profile name
-
-**Note:** Custom variables use `{variable}` while VS Code built-in variables use `${variable}`.
-
-**Using VS Code Built-in Variables:**
-
-This extension composes your custom pattern first, then VS Code processes its built-in variables. This means you can freely combine both types:
-
-```json
-// Remote SSH development with custom variables
-"${remoteName} | {workspace} [{branch}]"
-// Result when SSH'd: "ssh: myserver | my-project [main]"
-
-// Show dirty indicator with custom branch info
-"${dirty}{workspace} [{branch}]${separator}${appName}"
-// Result: "• my-project [feature/xyz] - Visual Studio Code"
-
-// Full power: remote, env vars, and custom variables
-"${remoteName} | {env.USER} | {workspace} [{branch}] {timestamp}"
-// Result: "ssh: prod-server | john | my-app [hotfix] 14:30"
-```
+**Note:** All variables use single curly braces `{variable}`. VS Code's built-in variables like `${remoteName}` are **not** supported by this extension.
 
 **Fallback Patterns:**
 
@@ -149,14 +120,11 @@ Use the `||` operator to create smart fallbacks that gracefully handle missing i
 // Environment variables with fallbacks
 "{env.USER || workspace} - {repo} [{branch}]"
 
-// With VS Code's remoteName for SSH/Remote development
-"${remoteName} | {workspace} [{branch}]"
+// Folder and filename
+"{env.USER}@{env.HOSTNAME} {folder}/{filename}"
 
-// Combining remote, user, and custom variables
-"${remoteName} | {env.USER} | {workspace} [{branch}] {filename}"
-
-// Full example with dirty indicator and separator
-"${dirty}{workspace || repo}${separator}{branch}${separator}${remoteName}"
+// Full example with all components
+"{env.USER}@{env.HOSTNAME} | {workspace} [{branch}] {folder}/{filename} (last: {timestamp})"
 ```
 
 ## 🛠️ Development

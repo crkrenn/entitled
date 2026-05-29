@@ -65,7 +65,7 @@
         "entitled.titlePattern": {
           "type": "string",
           "default": "{workspace} {branch} {filename} - VSCode",
-          "description": "Custom title pattern with variable substitution and smart fallbacks. Custom variables: {workspace}, {repo}, {branch}, {filename}, {timestamp}, {env.VARNAME}. VS Code built-in variables also supported: ${remoteName}, ${dirty}, ${separator}, etc. Use || for fallbacks: {workspace || repo || filename}. Examples: '${remoteName} | {workspace} [{branch}]' or '{env.USER}@{env.HOSTNAME} | {workspace}'"
+          "description": "Custom title pattern with variable substitution and smart fallbacks. Variables: {workspace}, {repo}, {branch}, {filename}, {folder}, {timestamp}, {env.VARNAME}. Use || for fallbacks: {workspace || repo || filename}. Examples: '{env.USER}@{env.HOSTNAME} | {workspace} [{branch}]' or '{folder}/{filename}'"
         }
       }
     }
